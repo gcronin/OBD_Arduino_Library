@@ -16,7 +16,7 @@
 
 ###### Public Variables:
 * int codes[3];
-*
+
 ###### Examples:
  **OBDSerial.ino:**  Displays data for many PIDs via a hardware Serial connection.
  
