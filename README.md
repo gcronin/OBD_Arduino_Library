@@ -1,4 +1,4 @@
-# OBD II UART Arduino Library
+## OBD II UART Arduino Library
  This is a library for use with the Sparkfun OBD II UART, item #WIG-09555, connected to an Arduino or similar device via a Software Serial connection.
  
 ###### Classes:  
