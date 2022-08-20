@@ -144,12 +144,12 @@ void OBD::getResponse(char endCharacter, int timeout){
         rxData[rxIndex]='\0';
         rxIndex = 0;
       }
-      //Now check if we've received a space character (' ').
-      else if(this->peek() == ' '){
-        //Clear the space without saving
+      //Now check if we've received a space character (' ') or newline ('\r').
+      else if(this->peek() == ' ' || this->peek() == '\r'){
+        //Clear the space/newline without saving
         inChar=this->read();
       }
-      //If we didn't get the end character or a space, just add the new character to the string.
+      //If we didn't get the end character, a space, or newline, just add the new character to the string.
       else{
         //Get the new character from the Serial port.
         inChar = this->read();
@@ -182,7 +182,7 @@ int OBD::getData(PID _PID) {
   getResponse('\r');
 
   if(debugLevel) { 
-    for(int i=0; i<rxBufferLength; i++) {  _debug->print(rxData[i]);  }
+    _debug->print(rxData);
     _debug->print(" ");
   }
   
@@ -254,7 +254,7 @@ void OBD::getCodes() {
   getResponse('\r');
 
   if(debugLevel) { 
-    for(int i=0; i<rxBufferLength; i++) {  _debug->print(rxData[i]);  }
+    _debug->print(rxData);
     _debug->print(" ");
   }
   
@@ -264,7 +264,7 @@ void OBD::getCodes() {
   
   if(syncLocation != -1) {
     for(int j=0; j<3; j++) {
-      String codeString = "";  int codeInt;
+      String codeString = "";
       boolean bufferOverflow = false;
       //offset is 0 first loop, 4 second loop, 8 third loop
       uint8_t indexOffset = 0;
@@ -280,23 +280,15 @@ void OBD::getCodes() {
           break;
         }
       }
-      codeInt = codeString.toInt();
-      // error if index of rxData overflowed or toInt returned -1 (no codes are negative)
-      if (codeInt<0 || bufferOverflow) {
+      codes[j] = codeString.toInt();
+      // error if index of rxData overflowed
+      if (bufferOverflow) {
         if(debugLevel) { _debug->print("Err"); }
         break;
       }
-      else if (codeInt>0) {
-        if(debugLevel) { _debug->print(codeInt);  _debug->print(" "); }
-        codes[j] = codeInt;
-      }
-      else {
-        // if first code is zero than there are no codes, otherwise just stop outer loop
-        if( j == 0 ) if(debugLevel) { _debug->print("No Codes"); }
-        break;
-      }
+      else 
+        if(debugLevel) { _debug->print(codes[j]);  _debug->print(" "); }
     }
   }
-  
   if(debugLevel) { _debug->println(""); }
 }
