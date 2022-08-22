@@ -21,13 +21,13 @@ OBD OBD;
 
 int parsePercent(char *data, int index) {
   int percent = strtol(&data[index],0,16)*100/255;
-  return (abs(percent) > 100) ? -1 : percent;
+  return (abs(percent) > 100) ? -999 : percent;
 }
 
 int parseTemp(char *data, int index) {
   int temp = strtol(&data[index],0,16)-40;
-  temp = (abs(temp) > 500) ? -1 : temp;
-  if(temp == -1) return -1;
+  temp = (abs(temp) > 500) ? -999 : temp;
+  if(temp == -999) return -999;
   else {
     float tempC = float(temp);
     float tempF = (tempC*1.8)+32;
@@ -41,8 +41,8 @@ int parseRPM(char *data, int index) {
 
 int parseMPH(char *data, int index) {
   int spd = strtol(&data[index],0,16);
-  spd = (abs(spd) > 300) ? -1 : spd;
-  if(spd == -1) return -1;
+  spd = (abs(spd) > 300) ? -999 : spd;
+  if(spd == -999) return -999;
   else {
     float kph = float(spd);
     float mph = (kph*0.62);
@@ -52,17 +52,17 @@ int parseMPH(char *data, int index) {
 
 int parseTiming(char *data, int index) {
   int timing = strtol(&data[index],0,16)/2-64;
-  return (abs(timing) > 64) ? -1 : timing;
+  return (abs(timing) > 64) ? -999 : timing;
 }
 
 int parseMAF(char *data, int index) {
   int flow = strtol(&data[index],0,16)/100;
-  return (flow > 655 || flow < 0) ? -1 : flow;
+  return (flow > 655 || flow < 0) ? -999 : flow;
 }
 
 int parseFuelTrim(char *data, int index) {
   int percent = (strtol(&data[index],0,16)-128)*100/128;
-  return (abs(percent) > 100) ? -1 : percent;
+  return (abs(percent) > 100) ? -999 : percent;
 }
 
 int parseO2Sense(char *data, int index) {
@@ -72,7 +72,8 @@ int parseO2Sense(char *data, int index) {
   int LowByte = strtol(Hex,0,16);
   int temp = LowByte - 128;
   temp = temp*HighByte;
-  return temp/256;
+  temp = temp/256;
+  return (abs(temp) > 100) ? -999 : temp;
 }
 ///////////////////////////////////////////////////////////////////
 

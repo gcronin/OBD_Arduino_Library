@@ -30,8 +30,8 @@ int parseRPM(char *data, int index) {
 
 int parseMPH(char *data, int index) {
   int spd = strtol(&data[index],0,16);
-  spd = (abs(spd) > 300) ? -1 : spd;
-  if(spd == -1) return -1;
+  spd = (abs(spd) > 300) ? -999 : spd;
+  if(spd == -999) return -999;
   else {
     float kph = float(spd);
     float mph = (kph*0.62);

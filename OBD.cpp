@@ -111,7 +111,8 @@ boolean OBD::resetCodes() {
 }
 
 /*!
-  @brief   Read Software Serial buffer till end of message character received.  Discard spaces.
+  @brief   Read Software Serial buffer till end of message character received.  Discard spaces/newlines,
+            unless they are the designated end character.
   @note    The getResponse function collects incoming data from the UART into the rxData buffer
             and only exits when a designated end character is seen. Once the end character
             is detected, the rxData buffer is null terminated (so we can treat it as a string)
@@ -167,6 +168,7 @@ void OBD::getResponse(char endCharacter){
 /*!
   @brief   Read data for a struct PID (defined in OBD.h)
   @note    Won't work for 'at' type commands
+  @note    Returns -998 if couldn't find the expected response
 */
 int OBD::getData(PID _PID) {
   char expResponse[5];
@@ -201,12 +203,13 @@ int OBD::getData(PID _PID) {
   }
   else {
     if(debugLevel) { _debug->println(""); }
-    return -1;
+    return -998;
   }
 }
 
 /*!
   @brief   Read battery voltage, return as a float
+  @note    Returns -998.0 if couldn't find the expected response.
 */
 float OBD::getVoltage() {
   char expResponse[5] = {'a','t','r','v','\0'};
@@ -218,7 +221,7 @@ float OBD::getVoltage() {
   getResponse('>');
 
   if(debugLevel) { 
-    for(int i=0; i<rxBufferLength; i++) {  _debug->print(rxData[i]);  }
+    _debug->print(rxData);
     _debug->print(" ");
   }
   
@@ -236,12 +239,13 @@ float OBD::getVoltage() {
   }
   else {
     if(debugLevel) { _debug->println(""); }
-    return -1;
+    return -998.0;
   }
 }
 
 /*!
-  @brief   Read up to three Error Codes, store in array OBD::codes[]
+  @brief   Read three Error Codes, store in array OBD::codes[]
+  @note    Null errors are recorded as zeros.
 */
 void OBD::getCodes() {
   char expResponse[3] = {'4','3','\0'};
